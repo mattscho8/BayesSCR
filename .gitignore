@@ -1,5 +1,6 @@
 .Rhistory 
 *.exe
 *.stan
+mod_*
 ODL_NIMBLE_PPP.R
 ODL_NIMBLE_PPP_2.R
