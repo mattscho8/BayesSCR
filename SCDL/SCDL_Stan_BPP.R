@@ -3,10 +3,11 @@ library(posterior)
 library(bayesplot)
 library(ggplot2)
 library(dplyr)
+library(here)
 
 ### get the blackbear data ###
-tmp = readRDS('../data.rds') # gets data summaries that we use in all models
-tmp2 = readRDS('../int_data.rds')
+tmp = readRDS(here('data.rds')) # gets data summaries that we use in all models
+tmp2 = readRDS(here('int_data.rds'))
 list2env(tmp, .GlobalEnv)
 list2env(tmp2, .GlobalEnv)
 
@@ -99,9 +100,9 @@ model {
 
 "
 
-cat(aaa, file = "mod_scdl_bpp.stan")
+cat(aaa, here("SCDL","mod_scdl_bpp.stan"))
 
-stan_fit = cmdstan_model("mod_scdl_bpp.stan")
+stan_fit = cmdstan_model(here("SCDL","mod_scdl_bpp.stan"))
 
 fit <- stan_fit$sample(
   data = dat,

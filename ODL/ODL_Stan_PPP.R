@@ -5,8 +5,8 @@ library(ggplot2)
 library(dplyr)
 
 ### get the blackbear data ###
-tmp = readRDS('../data.rds') # gets data summaries that we use in all models
-tmp2 = readRDS('../int_data.rds')
+tmp = readRDS(here('data.rds')) # gets data summaries that we use in all models
+tmp2 = readRDS(here('int_data.rds'))
 list2env(tmp, .GlobalEnv)
 list2env(tmp2, .GlobalEnv)
 
@@ -98,9 +98,9 @@ model {
 
 "
 
-cat(aaa, file = "mod_odl_ppp.stan")
+cat(aaa, file = here("ODL","mod_odl_ppp.stan"))
 
-stan_fit = cmdstan_model("mod_odl_ppp.stan")
+stan_fit = cmdstan_model(here("ODL","mod_odl_ppp.stan"))
 
 fit <- stan_fit$sample(
   data = dat,
