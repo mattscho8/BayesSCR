@@ -103,6 +103,7 @@ cat(aaa, file = here("SCDL","mod_scdl_ppp.stan"))
 
 stan_fit = cmdstan_model(here("SCDL","mod_scdl_ppp.stan"))
 
+t1 = proc.time()
 fit <- stan_fit$sample(
   data = dat,
   init = inits,
@@ -115,6 +116,8 @@ fit <- stan_fit$sample(
   parallel_chains = 4,
   refresh = 50
 )
+t2 = proc.time()
+partime3 = t2-t1
 
 parout3 = as_draws_df(fit$draws(c("p0", "sigma", "EN", "phi")))
 mcmc_trace(parout3)

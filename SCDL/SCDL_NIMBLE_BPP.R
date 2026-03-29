@@ -91,11 +91,14 @@ MCMCconf <- configureMCMC(model = model,
 MCMC <- buildMCMC(MCMCconf)
 cMCMC <- compileNimble(MCMC)
 
-MCMCRuntime <- system.time(samples <- runMCMC( mcmc = cMCMC,
-                                               nburnin = 1000,
-                                               niter = 5000,
-                                               nchains = 4,
-                                               samplesAsCodaMCMC = TRUE))
+t1 = proc.time()
+samples <- runMCMC( mcmc = cMCMC,
+                    nburnin = 1000,
+                    niter = 5000,
+                    nchains = 4,
+                    samplesAsCodaMCMC = TRUE))
+t2 = proc.time()
+outtime2 = t2-t1
 
 out_df2 = as_draws_df(samples)
 mcmc_trace(out_df2)

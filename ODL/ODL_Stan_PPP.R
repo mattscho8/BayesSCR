@@ -102,6 +102,7 @@ cat(aaa, file = here("ODL","mod_odl_ppp.stan"))
 
 stan_fit = cmdstan_model(here("ODL","mod_odl_ppp.stan"))
 
+t1 = proc.time()
 fit <- stan_fit$sample(
   data = dat,
   init = inits,
@@ -114,6 +115,8 @@ fit <- stan_fit$sample(
   parallel_chains = 4,
   refresh = 50
 )
+t2 = proc.time()
+partime4 = t2-t1
 
 parout4 = as_draws_df(fit$draws(c("p0", "sigma", "EN", "phi")))
 mcmc_trace(parout4)

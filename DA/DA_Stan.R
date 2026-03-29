@@ -93,6 +93,7 @@ cat(aaa, file = here("DA","mod_da.stan"))
 
 stan_fit = cmdstan_model(here("DA","mod_da.stan"))
 
+t1 <- proc.time()
 fit <- stan_fit$sample(
   data = dat,
   init = inits,
@@ -105,6 +106,8 @@ fit <- stan_fit$sample(
   parallel_chains = 4,
   refresh = 50
 )
+t2 <- proc.time()
+partime = t2-t1
 
 parout = as_draws_df(fit$draws(c("p0", "sigma","psi")))
 mcmc_trace(parout)
