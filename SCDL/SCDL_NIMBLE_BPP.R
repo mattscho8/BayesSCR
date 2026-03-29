@@ -5,8 +5,8 @@ library(ggplot2)
 library(dplyr)
 
 ### get the blackbear data ###
-tmp = readRDS(here('data.rds')) # gets data summaries that we use in all models
-tmp2 = readRDS(here('int_data.rds'))
+tmp = readRDS(here("data","data.rds")) # gets data summaries that we use in all models
+tmp2 = readRDS(here("data","int_data.rds"))
 list2env(tmp, .GlobalEnv)
 list2env(tmp2, .GlobalEnv)
 

@@ -6,7 +6,7 @@ library(dplyr)
 library(here)
 
 ### get the blackbear data ###
-tmp = readRDS(here('data.rds'))
+tmp = readRDS(here("data","data.rds"))
 list2env(tmp, .GlobalEnv)
 
 #### Plot
