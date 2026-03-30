@@ -3,6 +3,7 @@ library(posterior)
 library(bayesplot)
 library(ggplot2)
 library(dplyr)
+library(here)
 
 ### get the blackbear data ###
 tmp = readRDS(here("data","data.rds")) # gets data summaries that we use in all models
@@ -32,7 +33,7 @@ points(int_grid, pch = 16, col = "blue", cex = 0.5)
 # sxy
 inits = list(p0 = runif(1),
              sigma = rlnorm(1),
-             sxy = cbind(runif(M,0,x.max), runif(M,0,y.max),
+             sxy = cbind(runif(M,x.max/3,2*x.max/3), runif(M,y.max/3,2*y.max/3),
              phi = runif(1))
 )
 con = list(x.max = x.max, y.max = y.max, det.xy = grid, K = K, J = J, 
@@ -96,9 +97,9 @@ cMCMC <- compileNimble(MCMC)
 t1 = proc.time()
 samples <- runMCMC( mcmc = cMCMC,
                     nburnin = 1000,
-                    niter = 5000,
+                    niter = 6000,
                     nchains = 4,
-                    samplesAsCodaMCMC = TRUE))
+                    samplesAsCodaMCMC = TRUE)
 t2 = proc.time()
 outtime3 = t2-t1
 

@@ -80,8 +80,7 @@ cmodel <- compileNimble(model)
 
 MCMCconf <- configureMCMC(model = model,
                           monitors  = c("N","sigma","psi","p0"),
-                          control = list(reflective = TRUE),
-                          thin = 10)
+                          control = list(reflective = TRUE))
 
 MCMC <- buildMCMC(MCMCconf)
 cMCMC <- compileNimble(MCMC)
@@ -89,9 +88,9 @@ cMCMC <- compileNimble(MCMC)
 t1 = proc.time()
 samples <- runMCMC( mcmc = cMCMC,
                     nburnin = 1000,
-                    niter = 5000,
+                    niter = 6000,
                     nchains = 4,
-                    samplesAsCodaMCMC = TRUE))
+                    samplesAsCodaMCMC = TRUE)
 t2 = proc.time()
 outtime = t2-t1
 

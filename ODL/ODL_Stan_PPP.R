@@ -3,6 +3,7 @@ library(posterior)
 library(bayesplot)
 library(ggplot2)
 library(dplyr)
+library(here)
 
 ### get the blackbear data ###
 tmp = readRDS(here("data","data.rds")) # gets data summaries that we use in all models
@@ -31,9 +32,9 @@ points(int_grid, pch = 16, col = "blue", cex = 0.5)
 # z
 # sxy
 inits = function(){
-  return(list(p0 = runif(1, 0.25, 0.75),
-              sigma = rlnorm(1),
-              phi = runif(1,0.25,1)))
+  return(list(p0 = runif(1, 0.1, 0.5),
+              sigma = runif(1,1.5,5),
+              phi = runif(1,0.1,1)))
 }
 dat = list(x_max = x.max, y_max = y.max, det_x = grid[,1], det_y = grid[,2], K = K, 
            J = J, n=n, d2int = d2int, n_i = n_i, tot_area = tot_area, 
