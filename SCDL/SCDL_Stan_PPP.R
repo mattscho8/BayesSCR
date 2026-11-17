@@ -37,11 +37,11 @@ inits = function(){
               sigma = rlnorm(1),
               sx = runif(n,0,x.max),
               sy = runif(n,0,y.max),
-              phi = runif(1,0,1)))
+              psi = runif(1,0,1)))
 }
 dat = list(x_max = x.max, y_max = y.max, det_x = grid[,1], det_y = grid[,2], K = K, 
            J = J, n=n, d2int = d2int, n_i = n_i, tot_area = tot_area, 
-           int_area = int_area, xobs = xobs, phimax = 1)
+           int_area = int_area, xobs = xobs, psimax = 1)
 
 aaa = "
 
@@ -58,19 +58,19 @@ data {
   matrix[n_i,K] d2int;
   real tot_area;
   real int_area;
-  real phimax;
+  real psimax;
 }
 
 parameters {
   real<lower=0, upper=1> p0; 
   real<lower=0, upper = 50> sigma;
-  real<lower=0, upper = phimax> phi;
+  real<lower=0, upper = psimax> psi;
   row_vector<lower=0,upper=x_max>[n] sx;
   row_vector<lower=0,upper=y_max>[n] sy;
 }
 
 transformed parameters {
-  real EN= phi*tot_area;
+  real EN= psi*tot_area;
 }
 
 model {
@@ -91,9 +91,9 @@ model {
   
   logpint = log(p0) - d2int / (2*sigma^2);    
   logpdot = J*log1m_exp(logpint) * onevec_d;
-  target += -(n_i - sum(exp(logpdot)))*phi*int_area;
+  target += -(n_i - sum(exp(logpdot)))*psi*int_area;
   
-  target += n*log(phi);
+  target += n*log(psi);
 }
 
 
@@ -120,7 +120,7 @@ fit <- stan_fit$sample(
 t2 = proc.time()
 partime3 = t2-t1
 
-parout3 = as_draws_df(fit$draws(c("p0", "sigma", "EN", "phi")))
+parout3 = as_draws_df(fit$draws(c("p0", "sigma", "EN", "psi")))
 mcmc_trace(parout3)
 summary(parout3)
 

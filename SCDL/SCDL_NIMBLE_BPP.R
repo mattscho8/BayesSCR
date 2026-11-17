@@ -28,7 +28,6 @@ M = 150
 # y is yfull
 
 ###### inits
-# psi
 # p0
 # sigma
 # z

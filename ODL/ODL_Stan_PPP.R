@@ -34,11 +34,11 @@ points(int_grid, pch = 16, col = "blue", cex = 0.5)
 inits = function(){
   return(list(p0 = runif(1, 0.1, 0.5),
               sigma = runif(1,1.5,5),
-              phi = runif(1,0.1,1)))
+              psi = runif(1,0.1,1)))
 }
 dat = list(x_max = x.max, y_max = y.max, det_x = grid[,1], det_y = grid[,2], K = K, 
            J = J, n=n, d2int = d2int, n_i = n_i, tot_area = tot_area, 
-           int_area = int_area, xobs = t(xobs), phimax = 1)
+           int_area = int_area, xobs = t(xobs), psimax = 1)
 
 
 
@@ -57,18 +57,18 @@ data {
   matrix[n_i,K] d2int; // distances between integration points and each trap
   real tot_area;
   real int_area;
-  real phimax;
+  real psimax;
 }
 
 
 parameters {
   real<lower=0, upper=1> p0; 
   real<lower=0, upper = 50> sigma;
-  real<lower=0, upper = phimax> phi;
+  real<lower=0, upper = psimax> psi;
 }
 
 transformed parameters {
-  real EN= phi*tot_area;
+  real EN= psi*tot_area;
 }
 
 model {
@@ -82,12 +82,12 @@ model {
   //  likelihood component for n observed individuals
   logp = log(p0) - d2int / (2*sigma*sigma); // n_i x K
   log1mp = log1m_exp(logp);
-  capt_obs = int_area*phi*exp(logp * xobs + log1mp * (J - xobs));  // xobs is K x n matrix (transpose of typical)
+  capt_obs = int_area*psi*exp(logp * xobs + log1mp * (J - xobs));  // xobs is K x n matrix (transpose of typical)
   some = log(rep_row_vector(1.0, n_i) * capt_obs)*rep_vector(1.0, n); // takes the sum over integration points: capt is n x nint, ones is nint x 1
   target += some; // some gives the log likelihood contribution for each individual
 
   // likelihood component for e^-Lambda
-  capt_mis = int_area*phi*(1-exp(log1mp * rep_vector(J,K))); //log1mp is n_i x K
+  capt_mis = int_area*psi*(1-exp(log1mp * rep_vector(J,K))); //log1mp is n_i x K
   Lambda = sum(capt_mis);
   target += -Lambda;
  
@@ -119,6 +119,6 @@ fit <- stan_fit$sample(
 t2 = proc.time()
 partime4 = t2-t1
 
-parout4 = as_draws_df(fit$draws(c("p0", "sigma", "EN", "phi")))
+parout4 = as_draws_df(fit$draws(c("p0", "sigma", "EN", "psi")))
 mcmc_trace(parout4)
 summary(parout4)

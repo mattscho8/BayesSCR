@@ -28,12 +28,12 @@ yfull = rbind(xobs,matrix(0,M-n,K))
 # y is yfull
 
 ###### inits
-# psi
+# omega
 # p0
 # sigma
 # z
 # sxy
-inits = list(psi = runif(1),
+inits = list(omega = runif(1),
              p0 = runif(1),
              sigma = rlnorm(1),
              z = c(rep(1, n), rbinom(M-n,1,0.5)),
@@ -47,9 +47,9 @@ code <- nimbleCode({
     sxy[i,1] ~ dunif(0, x.max)
     sxy[i,2] ~ dunif(0, y.max)
   }
-  psi ~ dunif(0,1)
+  omega ~ dunif(0,1)
   for (i in 1:M) {
-    z[i] ~ dbern(psi)
+    z[i] ~ dbern(omega)
   }
   
   sigma ~ dunif(0, 50)
@@ -79,7 +79,7 @@ model <- nimbleModel( code = code,
 cmodel <- compileNimble(model)
 
 MCMCconf <- configureMCMC(model = model,
-                          monitors  = c("N","sigma","psi","p0"),
+                          monitors  = c("N","sigma","omega","p0"),
                           control = list(reflective = TRUE))
 
 MCMC <- buildMCMC(MCMCconf)

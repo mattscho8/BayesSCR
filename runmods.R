@@ -13,8 +13,8 @@ library(dplyr)
 library(posterior)
 library(cowplot)
 
-source(here("DA","DA_Stan.R"))
-source(here("DA","DA_NIMBLE.R"))
+source(here("SP","SP_Stan.R"))
+source(here("SP","SP_NIMBLE.R"))
 source(here("SCDL","SCDL_Stan_BPP.R"))
 source(here("SCDL","SCDL_Stan_PPP.R"))
 source(here("SCDL","SCDL_NIMBLE_BPP.R"))
@@ -22,22 +22,22 @@ source(here("SCDL","SCDL_NIMBLE_PPP.R"))
 source(here("ODL","ODL_Stan_PPP.R"))
 
 ### comparison of timings
-mod_labels = c("DA", "SCDL_BPP", "SCDL_PPP", "ODL_PPP", "DA", "SCDL_BPP", "SCDL_PPP")
-mod_timings = c(partime[3], partime2[3], partime3[3], partime4[3], outtime[3], outtime2[3], outtime3[3])
+mod_labels = c("B_SP", "B_SCDL", "P_SCDL", "P_ODL", "B_SP", "B_SCDL", "P_SCDL")
+mod_timings = c(partime[3]/2, partime2[3]/2, partime3[3]/2, partime4[3]/2, outtime[3]/6, outtime2[3]/6, outtime3[3]/6)
 mod_software = c(rep("Stan",4), rep("NIMBLE",3))
 
-plot_df = data.frame(model = factor(mod_labels, levels = c("DA", "SCDL_BPP", "SCDL_PPP", "ODL_PPP")), time = mod_timings, software = factor(mod_software,levels = c("Stan","NIMBLE")))
+plot_df = data.frame(model = factor(mod_labels, levels = c("B_SP", "B_SCDL", "P_SCDL", "P_ODL")), time = mod_timings, software = factor(mod_software,levels = c("Stan","NIMBLE")))
 
 plt_t1 = ggplot(plot_df, aes(x = model, y = time, fill = software)) +
   geom_bar(stat = "identity", position = position_dodge(preserve = "single")) + 
   theme_bw() + 
 #  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(x = "Model", y = "Time (seconds)", fill = "Software") +
+  labs(x = "Model", y = "Time (seconds / 1000 iterations)", fill = "Software") +
   scale_fill_manual(values = c("Stan" = "black", "NIMBLE" = "grey50"))
 ggsave(here("./output/time.pdf"), plot = plt_t1, width = 7, height = 4, units = "in")
 
 ### Effective sample size / second. Facet by parameter
-## Other = psi (DA), N (BPP) and phi/lambda (PPP)
+## Other = omega (DA), N (BPP) and psi/lambda (PPP)
 sp = summary(parout)
 sp2 = summary(parout2)
 sp3 = summary(parout3)
@@ -49,9 +49,9 @@ so3 = summary(out_df3)
 mod_ess = c(sp$ess_bulk/partime[3],sp2$ess_bulk/partime2[3], sp3$ess_bulk[c(1,2,4)]/partime3[3], sp4$ess_bulk[c(1,2,4)]/partime4[3], so$ess_bulk[2:4]/outtime[3], so2$ess_bulk/outtime2[3], so3$ess_bulk[2:4]/outtime3[3])
 mod_par = c(sp$variable, sp2$variable, sp3$variable[c(1,2,4)], sp4$variable[c(1,2,4)], so$variable[2:4], so2$variable, so3$variable[2:4])
 mod_mod = rep(mod_labels, each = 3)
-plot_df2 = data.frame(model = factor(mod_mod, levels = c("DA", "SCDL_BPP", "SCDL_PPP", "ODL_PPP")), parameter = factor(mod_par,levels = c("p0","sigma","psi","N","phi")), ess = mod_ess, software = factor(c(rep("Stan", 12), rep("NIMBLE",9)), levels = c("Stan", "NIMBLE")
+plot_df2 = data.frame(model = factor(mod_mod, levels = c("B_SP", "B_SCDL", "P_SCDL", "P_ODL")), parameter = factor(mod_par,levels = c("p0","sigma","omega","N","psi")), ess = mod_ess, software = factor(c(rep("Stan", 12), rep("NIMBLE",9)), levels = c("Stan", "NIMBLE")
 ))
-plot_df2$parameter = fct_recode(plot_df2$parameter, other = "psi", other = "N", other = "phi")
+plot_df2$parameter = fct_recode(plot_df2$parameter, other = "omega", other = "N", other = "psi")
 
 
 plt_ess = ggplot(plot_df2, aes(x = model, y = ess, fill = software)) +
@@ -79,9 +79,9 @@ summary_df$software = factor(summary_df$software, levels = c("Stan", "NIMBLE"))
 
 summary_p0 = summary_df |> filter(variable == "p0")
 summary_sigma = summary_df |> filter(variable == "sigma")
-summary_psi = summary_df |> filter(variable == "psi")
+summary_omega = summary_df |> filter(variable == "omega")
 summary_N = summary_df |> filter(variable == "N")
-summary_phi = summary_df |> filter(variable == "phi")
+summary_psi = summary_df |> filter(variable == "psi")
 
 # First p0
 p1 = ggplot(summary_p0, aes(x = model, y = median, ymin = q5, ymax = q95, colour = software)) +
@@ -99,13 +99,13 @@ p2 = ggplot(summary_sigma, aes(x = model, y = median, ymin = q5, ymax = q95, col
   labs(x = "", y = "") + 
   facet_wrap(~ "sigma", labeller = label_parsed)
 
-# Psi
-p3 = ggplot(summary_psi, aes(x = model, y = median, ymin = q5, ymax = q95, colour = software)) +
+# omega
+p3 = ggplot(summary_omega, aes(x = model, y = median, ymin = q5, ymax = q95, colour = software)) +
   geom_pointrange(position = position_dodge(preserve = "single", width = 0.5)) +
   theme_bw() +
   scale_colour_manual(values = c("Stan" = "black", "NIMBLE" = "grey50")) +
   labs(x = "", y = "") + 
-  facet_wrap(~ "psi", labeller = label_parsed)
+  facet_wrap(~ "omega", labeller = label_parsed)
 
 # N
 p4 = ggplot(summary_N, aes(x = model, y = median, ymin = q5, ymax = q95, colour = software)) +
@@ -115,13 +115,13 @@ p4 = ggplot(summary_N, aes(x = model, y = median, ymin = q5, ymax = q95, colour 
   labs(x = "", y = "") + 
   facet_wrap(~ "N")
 
-# phi
-p5 = ggplot(summary_phi, aes(x = model, y = median, ymin = q5, ymax = q95, colour = software)) +
+# psi
+p5 = ggplot(summary_psi, aes(x = model, y = median, ymin = q5, ymax = q95, colour = software)) +
   geom_pointrange(position = position_dodge(preserve = "single", width = 0.5)) +
   theme_bw() +
   scale_colour_manual(values = c("Stan" = "black", "NIMBLE" = "grey50")) +
   labs(x = "", y = "") + 
-  facet_wrap(~ "phi", labeller = label_parsed)
+  facet_wrap(~ "psi", labeller = label_parsed)
 
 # Remove legends from all plots 
 p1_nl <- p1 + theme(legend.position = "none") 

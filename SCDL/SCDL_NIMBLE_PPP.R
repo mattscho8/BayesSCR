@@ -34,11 +34,11 @@ points(int_grid, pch = 16, col = "blue", cex = 0.5)
 inits = list(p0 = runif(1),
              sigma = rlnorm(1),
              sxy = cbind(runif(M,x.max/3,2*x.max/3), runif(M,y.max/3,2*y.max/3),
-             phi = runif(1))
+             psi = runif(1))
 )
 con = list(x.max = x.max, y.max = y.max, det.xy = grid, K = K, J = J, 
            n=n, d2int = d2int, n_i = n_i, tot_area = tot_area, int_area = int_area, 
-           phimax = 1)
+           psimax = 1)
 dat = list(y = xobs, one = 1, zero = 0)
 
 code <- nimbleCode({
@@ -64,14 +64,14 @@ code <- nimbleCode({
     ptot[i] <- prod(ptmp[i,1:K])
     pdot[i] <- 1-ptot[i]
   }
-  lam <- sum(pdot[1:n_i])*phi*int_area # area 1 gives total area, area 2 is area of each cell
+  lam <- sum(pdot[1:n_i])*psi*int_area # area 1 gives total area, area 2 is area of each cell
   zero ~ dpois(lam)
   
-  one ~ dbinom(p = (phi/phimax)^n, size = 1) # gets lambda() into model
+  one ~ dbinom(p = (psi/psimax)^n, size = 1) # gets lambda() into model
   
-  phi ~ dunif(0,phimax)
+  psi ~ dunif(0,psimax)
   
-  EN <- phi*tot_area
+  EN <- psi*tot_area
 })
 
 ## Create and compile the NIMBLE model
@@ -88,7 +88,7 @@ model <- nimbleModel( code = code,
 cmodel <- compileNimble(model)
 
 MCMCconf <- configureMCMC(model = model,
-                          monitors  = c("EN","sigma","phi","p0"),
+                          monitors  = c("EN","sigma","psi","p0"),
                           control = list(reflective = TRUE))
 
 MCMC <- buildMCMC(MCMCconf)

@@ -28,7 +28,6 @@ points(int_grid, pch = 16, col = "blue", cex = 0.5)
 M = 150
 
 ###### inits
-# psi
 # p0
 # sigma
 # z
